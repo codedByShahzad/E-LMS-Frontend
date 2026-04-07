@@ -1,14 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useRegisterUserMutation } from "@/src/features/api/authApi";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [
+    registerUser,
+    { data, error, isLoading, isSuccess, isError },
+  ] = useRegisterUserMutation();
+
+  // ✅ Redirect after success
+  useEffect(() => {
+    if (isSuccess) {
+      setTimeout(() => {
+        router.push("/login");
+      }, 1200);
+    }
+  }, [isSuccess, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,37 +36,80 @@ export default function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(form);
+
+    if (isLoading) return;
+
+    if (!form.name || !form.email || !form.password) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    registerUser(form);
   };
 
-  return (
-    <div className="min-h-screen flex bg-[#f8fafc]">
+  const errorMessage =
+    (error as any)?.data?.message || "Something went wrong";
 
-      {/* LEFT SIDE */}
-      <div className="hidden lg:flex w-1/2 bg-green-600 text-white flex-col justify-center px-16">
-        <h1 className="text-4xl font-bold mb-4">
-          Start Your Journey 🚀
-        </h1>
-        <p className="text-lg opacity-90">
-          Create your account and unlock access to powerful learning tools.
-        </p>
+  return (
+    <div className="min-h-screen flex bg-[#0f0f13] font-sans">
+      {/* LEFT PANEL */}
+      <div className="hidden lg:flex w-[52%] relative overflow-hidden flex-col justify-between p-14">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600" />
+
+        <div className="relative z-10">
+          <h1 className="text-5xl font-bold text-white leading-tight mb-6">
+            Start your journey
+            <br />
+            <span className="text-white/80">with Learnly</span>
+          </h1>
+          <p className="text-white/70 max-w-sm">
+            Join thousands of learners building real-world skills and leveling
+            up their careers.
+          </p>
+        </div>
+
+        <div className="relative z-10 text-white/60 text-sm">
+          © 2026 Learnly. All rights reserved.
+        </div>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+      {/* RIGHT PANEL */}
+      <div className="flex w-full lg:w-[48%] items-center justify-center px-6 bg-[#fafafa]">
+        <div className="w-full max-w-[420px]">
 
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            Create account
+          <h2 className="text-[28px] font-bold text-gray-900 mb-1">
+            Create your account
           </h2>
-          <p className="text-gray-500 mb-6">
-            Enter your details to get started
+          <p className="text-gray-400 text-sm mb-8">
+            Get started in seconds
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {/* ERROR */}
+          {isError && (
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+              <p className="text-red-700 text-sm font-semibold">
+                Signup failed
+              </p>
+              <p className="text-red-500 text-xs mt-1">
+                {errorMessage}
+              </p>
+            </div>
+          )}
 
+          {/* SUCCESS */}
+          {isSuccess && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-6">
+              <p className="text-emerald-700 text-sm font-semibold">
+                Account created! Redirecting...
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* NAME */}
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">
+              <label className="text-xs font-semibold text-gray-600 mb-1 block uppercase tracking-wider">
                 Full Name
               </label>
               <input
@@ -55,14 +118,18 @@ export default function SignupPage() {
                 placeholder="John Doe"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                disabled={isLoading}
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm
+                focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500
+                disabled:opacity-50"
                 required
               />
             </div>
 
+            {/* EMAIL */}
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">
-                Email
+              <label className="text-xs font-semibold text-gray-600 mb-1 block uppercase tracking-wider">
+                Email Address
               </label>
               <input
                 type="email"
@@ -70,38 +137,74 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                disabled={isLoading}
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm
+                focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500
+                disabled:opacity-50"
                 required
               />
             </div>
 
+            {/* PASSWORD */}
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">
+              <label className="text-xs font-semibold text-gray-600 mb-1 block uppercase tracking-wider">
                 Password
               </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm
+                  focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500
+                  disabled:opacity-50"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 text-sm"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
+            {/* BUTTON */}
             <button
               type="submit"
-              className="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
+              disabled={
+                isLoading ||
+                isSuccess ||
+                !form.name ||
+                !form.email ||
+                !form.password
+              }
+              className="w-full py-3 rounded-xl font-semibold text-sm text-white
+                bg-gradient-to-r from-green-600 to-emerald-600
+                hover:from-green-700 hover:to-emerald-700
+                disabled:opacity-70 disabled:cursor-not-allowed
+                transition-all"
             >
-              Create Account
+              {isLoading
+                ? "Creating account..."
+                : isSuccess
+                ? "Redirecting..."
+                : "Create Account"}
             </button>
           </form>
 
-          <p className="text-sm text-gray-500 text-center mt-6">
+          {/* FOOTER */}
+          <p className="text-xs text-gray-400 text-center mt-8">
             Already have an account?{" "}
-            <Link href="/login" className="text-indigo-600 font-medium hover:underline">
-              Login
+            <Link
+              href="/login"
+              className="text-green-600 font-semibold hover:underline"
+            >
+              Sign in
             </Link>
           </p>
         </div>
