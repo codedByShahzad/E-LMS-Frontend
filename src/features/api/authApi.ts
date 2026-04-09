@@ -1,8 +1,21 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query"
 import { createApi } from "@reduxjs/toolkit/query/react"
 import { userLoggedIn } from "../authSlice";
+import { url } from "inspector";
+import { METHODS } from "http";
 
 const userApi = "http://localhost:8080/api/v1/user/"
+
+interface UserType {
+  id: string;
+  email: string;
+  name: string;
+  role: string
+  enrolledCourses: [],
+  photoUrl: string
+
+  // add other user fields your API returns
+}
 
 export const authApi = createApi({
     reducerPath: "authApi",
@@ -11,7 +24,7 @@ export const authApi = createApi({
         credentials: 'include',
     }),
     endpoints: (builder) => ({       // ✅ ({ — opens object with parenthesis
-        registerUser: builder.mutation({
+        registerUser: builder.mutation({       // Mutation when we use .post()
             query: (inputData) => ({
                 url: "register",
                 method: "POST",
@@ -33,9 +46,16 @@ export const authApi = createApi({
                 }
             }
         }),
+        loadUser: builder.query<UserType, void>({   // query when we need to get soemthing .get()
+            query: () =>({
+                url: "/profile",
+                method: "GET"
+            })
+        })
+
     })                               // ✅ }) — closes object with parenthesis
 })
 
 
 // Export the auto-generated hook
-export const { useRegisterUserMutation, useLoginUserMutation } = authApi
+export const { useRegisterUserMutation, useLoginUserMutation, useLoadUserQuery } = authApi

@@ -24,6 +24,7 @@ import {
 import { enrolledCourses } from "@/src/lib/courseData";
 import { courseProgress } from "@/src/lib/courseData";
 import CourseCard from "@/src/components/CourseCard";
+import { useLoadUserQuery } from "@/src/features/api/authApi";
 
 // Mock user data - simplified
 const userData = {
@@ -35,14 +36,19 @@ const userData = {
   joinedDate: "January 2024",
 };
 
+
+
 export default function ProfilePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState(userData);
   const [tempAvatar, setTempAvatar] = useState(userData.avatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {data, isLoading} = useLoadUserQuery()
+
+console.log(data)
 
   // Calculate stats
   const totalCourses = enrolledCourses.length;
@@ -77,10 +83,8 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     setFormData({ ...formData, avatar: tempAvatar });
-    setIsLoading(false);
     setIsSuccess(true);
     setTimeout(() => {
       setIsSuccess(false);
