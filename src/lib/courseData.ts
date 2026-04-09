@@ -167,3 +167,133 @@ export const latestCourses: Course[] = [
     tags: ["Penetration Testing", "Kali Linux", "Network Security", "Cryptography"],
   },
 ];
+
+
+export const enrolledCourses: Course[] = [
+  {
+    id: "e1",
+    title: "Complete Web Development Bootcamp 2024",
+    thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
+    instructor: {
+      id: "i1",
+      name: "Sarah Johnson",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
+      title: "Senior Full Stack Developer",
+    },
+    difficulty: "Beginner",
+    price: 89.99,
+    rating: 4.9,
+    reviewCount: 2847,
+    duration: "42 hours",
+    lessonsCount: 156,
+    category: "Development",
+    tags: ["HTML", "CSS", "JavaScript", "React"],
+  },
+  {
+    id: "e2",
+    title: "Python for Data Science and Machine Learning",
+    thumbnail: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80",
+    instructor: {
+      id: "i2",
+      name: "Michael Chen",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
+      title: "Data Scientist at Google",
+    },
+    difficulty: "Intermediate",
+    price: 94.99,
+    rating: 4.8,
+    reviewCount: 1923,
+    duration: "38 hours",
+    lessonsCount: 124,
+    category: "Data Science",
+    tags: ["Python", "Pandas", "NumPy", "TensorFlow"],
+  },
+  {
+    id: "e3",
+    title: "UI/UX Design Masterclass: From Zero to Hero",
+    thumbnail: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80",
+    instructor: {
+      id: "i3",
+      name: "Emma Williams",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
+      title: "Lead Product Designer",
+    },
+    difficulty: "Beginner",
+    price: 79.99,
+    rating: 4.9,
+    reviewCount: 3156,
+    duration: "28 hours",
+    lessonsCount: 89,
+    category: "Design",
+    tags: ["Figma", "Adobe XD", "Prototyping", "User Research"],
+  },
+  {
+    id: "e4",
+    title: "AWS Certified Solutions Architect Professional",
+    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+    instructor: {
+      id: "i4",
+      name: "David Park",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80",
+      title: "Cloud Architect at AWS",
+    },
+    difficulty: "Advanced",
+    price: 129.99,
+    rating: 4.7,
+    reviewCount: 1456,
+    duration: "52 hours",
+    lessonsCount: 203,
+    category: "Cloud Computing",
+    tags: ["AWS", "EC2", "S3", "Lambda", "CloudFormation"],
+  },
+];
+
+
+export interface CourseProgress {
+  courseId: string;
+  completedLessons: number;
+  totalLessons: number;
+  lastAccessed: string;
+  nextLesson: string;
+  certificateEligible: boolean;
+  progressPercentage: number;
+}
+
+export const courseProgress: Record<string, CourseProgress> = {
+  "e1": {
+    courseId: "e1",
+    completedLessons: 45,
+    totalLessons: 156,
+    lastAccessed: "2 hours ago",
+    nextLesson: "CSS Flexbox Layouts",
+    certificateEligible: false,
+    progressPercentage: 29,
+  },
+  "e2": {
+    courseId: "e2",
+    completedLessons: 89,
+    totalLessons: 124,
+    lastAccessed: "Yesterday",
+    nextLesson: "Neural Networks Basics",
+    certificateEligible: false,
+    progressPercentage: 72,
+  },
+  "e3": {
+    courseId: "e3",
+    completedLessons: 89,
+    totalLessons: 89,
+    lastAccessed: "3 days ago",
+    nextLesson: "Course Completed",
+    certificateEligible: true,
+    progressPercentage: 100,
+  },
+  "e4": {
+    courseId: "e4",
+    completedLessons: 12,
+    totalLessons: 203,
+    lastAccessed: "1 week ago",
+    nextLesson: "AWS IAM Fundamentals",
+    certificateEligible: false,
+    progressPercentage: 6,
+  },
+};

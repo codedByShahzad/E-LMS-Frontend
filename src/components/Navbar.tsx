@@ -64,7 +64,7 @@ export default function Navbar() {
   }, [isProfileOpen]);
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/student", label: "Home", icon: Home },
     { href: "/courses", label: "Courses", icon: BookOpen },
     { href: "/community", label: "Community", icon: MessageCircle },
     { href: "/mentors", label: "Mentors", icon: Award },
@@ -72,8 +72,8 @@ export default function Navbar() {
 
   const profileLinks = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/my-learning", label: "My learning", icon: BookMarked },
-    { href: "/profile", label: "Edit Profile", icon: User },
+    { href: "/student/learning", label: "My learning", icon: BookMarked },
+    { href: "/student/profile", label: "Edit Profile", icon: User },
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 
