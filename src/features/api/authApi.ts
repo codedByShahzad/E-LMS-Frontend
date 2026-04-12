@@ -13,7 +13,7 @@ interface UserType {
   role: string
   enrolledCourses: [],
   photoUrl: string
-
+    createdAt: number
   // add other user fields your API returns
 }
 

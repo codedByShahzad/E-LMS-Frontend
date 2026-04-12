@@ -1,107 +1,69 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Mail,
   User,
   Calendar,
-  MapPin,
   GraduationCap,
   Edit3,
   BookOpen,
-  Award,
-  Clock,
-  TrendingUp,
   Search,
   Camera,
   X,
-  CheckCircle2,
-  Loader2,
-  Briefcase
 } from "lucide-react";
-import { enrolledCourses } from "@/src/lib/courseData";
-import { courseProgress } from "@/src/lib/courseData";
 import CourseCard from "@/src/components/CourseCard";
 import { useLoadUserQuery } from "@/src/features/api/authApi";
-
-// Mock user data - simplified
+import { Course } from "@/src/types/course";
+// Static fallback data
 const userData = {
-  firstName: "John",
-  lastName: "Doe",
+  name: "John Doe",
   email: "john.doe@example.com",
   role: "Student",
-  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+  photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
   joinedDate: "January 2024",
 };
 
+// Define the API response type
+// Define the API response type
+interface LoadUserResponse {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  photoUrl: string;
+  enrolledCourses: Course[]; // Change from string[] to Course[]
+  createdAt: string;
+  updatedAt: string;
+}
 
 
 export default function ProfilePage() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [formData, setFormData] = useState(userData);
-  const [tempAvatar, setTempAvatar] = useState(userData.avatar);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const {data, isLoading} = useLoadUserQuery()
-
-console.log(data)
-
-  // Calculate stats
-  const totalCourses = enrolledCourses.length;
-  const completedCourses = Object.values(courseProgress).filter(
-    p => p.progressPercentage === 100
-  ).length;
-
-  // Filter courses
-  const filteredCourses = enrolledCourses.filter(course => {
-    return course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           course.instructor.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
+  const { data, isLoading } = useLoadUserQuery();
+const apiUser = (data as any)?.user as LoadUserResponse;
+  
+  // Merge API data with fallbacks - handle empty photoUrl
+  const displayUser = {
+    name: apiUser?.name || userData.name,
+    email: apiUser?.email || userData.email,
+    role: apiUser?.role || userData.role,
+    photoUrl: apiUser?.photoUrl && apiUser.photoUrl.trim() !== "" 
+      ? apiUser.photoUrl 
+      : userData.photoUrl,
+    createdAt: apiUser?.createdAt || userData.joinedDate,
+    enrolledCourses: apiUser?.enrolledCourses
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setTempAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveAvatar = () => {
-    setTempAvatar("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setFormData({ ...formData, avatar: tempAvatar });
-    setIsSuccess(true);
-    setTimeout(() => {
-      setIsSuccess(false);
-      setIsEditModalOpen(false);
-    }, 1500);
-  };
-
-  const closeModal = () => {
-    if (!isLoading) {
-      setIsEditModalOpen(false);
-      setTempAvatar(formData.avatar);
-    }
-  };
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-surface-elevated pb-16">
-      {/* Profile Card - Modern Professional Design */}
+      {/* Profile Card */}
       <div className="bg-surface border-b border-border">
         <div className="page-container py-8 md:py-12">
           <div className="card p-6 md:p-8">
@@ -111,7 +73,7 @@ console.log(data)
                 <div className="relative w-24 h-24 md:w-28 md:h-28">
                   <div className="w-full h-full rounded-full overflow-hidden ring-4 ring-primary-100">
                     <Image
-                      src={formData.avatar}
+                      src={displayUser.photoUrl}
                       alt="Profile"
                       width={112}
                       height={112}
@@ -121,43 +83,32 @@ console.log(data)
                 </div>
               </div>
 
-              {/* Info - Stacked Layout */}
+              {/* Info */}
               <div className="flex-1 min-w-0">
-                {/* Name */}
                 <h1 className="text-2xl md:text-3xl font-bold text-content-primary mb-4">
-                  {formData.firstName} {formData.lastName}
+                  {displayUser.name}
                 </h1>
 
-                {/* Info Rows - Stacked */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-content-secondary">
                     <Mail className="w-4 h-4 text-content-tertiary flex-shrink-0" />
-                    <span className="text-body">{formData.email}</span>
+                    <span className="text-body">{displayUser.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-content-secondary">
                     <User className="w-4 h-4 text-content-tertiary flex-shrink-0" />
-                    <span className="text-body">{formData.role}</span>
+                    <span className="text-body capitalize">{displayUser.role}</span>
                   </div>
                   <div className="flex items-center gap-2 text-content-secondary">
                     <Calendar className="w-4 h-4 text-content-tertiary flex-shrink-0" />
-                    <span className="text-body">Joined {formData.joinedDate}</span>
+                    <span className="text-body">
+                      Joined {new Date(displayUser.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Stats & Edit Button */}
+              {/* Edit Button */}
               <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-6">
-                <div className="flex gap-3">
-                  <div className="text-center px-4 py-3 bg-surface-sunken rounded-xl min-w-[80px]">
-                    <p className="text-2xl font-bold text-content-primary">{totalCourses}</p>
-                    <p className="text-xs text-content-secondary mt-0.5">Courses</p>
-                  </div>
-                  <div className="text-center px-4 py-3 bg-success-light rounded-xl min-w-[80px]">
-                    <p className="text-2xl font-bold text-success">{completedCourses}</p>
-                    <p className="text-xs text-success/70 mt-0.5">Completed</p>
-                  </div>
-                </div>
-
                 <button 
                   onClick={() => setIsEditModalOpen(true)}
                   className="btn btn-outline btn-sm"
@@ -181,183 +132,98 @@ console.log(data)
             <input
               type="text"
               placeholder="Search your courses..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
             />
           </div>
         </div>
 
-        {filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
+
+{
+  displayUser.enrolledCourses.length === 0 ? (
+
+        <div className="empty-state py-16 bg-surface rounded-2xl border border-border">
+          <div className="w-20 h-20 bg-surface-sunken rounded-full flex items-center justify-center mb-6">
+            <GraduationCap className="w-10 h-10 text-content-tertiary" />
           </div>
-        ) : (
-          <div className="empty-state py-16 bg-surface rounded-2xl border border-border">
-            <div className="w-20 h-20 bg-surface-sunken rounded-full flex items-center justify-center mb-6">
-              <GraduationCap className="w-10 h-10 text-content-tertiary" />
-            </div>
-            <h3 className="text-heading-2 mb-2">No courses found</h3>
-            <p className="text-body text-content-secondary mb-6 max-w-md mx-auto">
-              {searchQuery 
-                ? "Try adjusting your search to find your courses."
-                : "You haven't enrolled in any courses yet. Start your learning journey today!"}
-            </p>
-            {!searchQuery && (
-              <Link href="/courses" className="btn btn-primary">
-                <BookOpen className="w-4 h-4" />
-                Explore Courses
-              </Link>
-            )}
-          </div>
-        )}
+          <h3 className="text-heading-2 mb-2">No courses found</h3>
+          <p className="text-body text-content-secondary mb-6 max-w-md mx-auto">
+            You haven't enrolled in any courses yet. Start your learning journey today!
+          </p>
+          <Link href="/courses" className="btn btn-primary">
+            <BookOpen className="w-4 h-4" />
+            Explore Courses
+          </Link>
+        </div>
+  ): (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {displayUser.enrolledCourses.map((course)=> <CourseCard key={course.id} course={course} />)}
+    </div>
+  ) 
+}
+        
       </div>
 
-      {/* Edit Modal with Avatar Upload */}
+      {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={closeModal}
+            onClick={() => setIsEditModalOpen(false)}
           />
-
           <div className="relative w-full max-w-md bg-surface rounded-2xl shadow-2xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-heading-2">Edit Profile</h2>
-              <button
-                onClick={closeModal}
-                disabled={isLoading}
-                className="btn btn-ghost p-2 disabled:opacity-50"
-              >
+              <button onClick={() => setIsEditModalOpen(false)} className="btn btn-ghost p-2">
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            {isSuccess && (
-              <div className="mb-4 flex items-center gap-2 bg-success-light border border-success/20 rounded-lg px-4 py-3">
-                <CheckCircle2 className="w-5 h-5 text-success" />
-                <p className="text-success text-sm font-medium">Profile updated!</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Avatar Upload Section */}
+            <form className="space-y-5">
               <div className="flex flex-col items-center">
                 <div className="relative mb-3">
                   <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-primary-100">
                     <Image
-                      src={tempAvatar}
+                      src={displayUser.photoUrl}
                       alt="Profile"
                       width={96}
                       height={96}
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleAvatarClick}
-                    className="absolute bottom-0 right-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-colors"
-                  >
+                  <button type="button" className="absolute bottom-0 right-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg">
                     <Camera className="w-4 h-4" />
                   </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
                 </div>
                 <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={handleAvatarClick}
-                    className="text-sm text-primary-600 hover:underline font-medium"
-                  >
-                    Change Photo
-                  </button>
+                  <button type="button" className="text-sm text-primary-600 font-medium">Change Photo</button>
                   <span className="text-content-tertiary">|</span>
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    className="text-sm text-error hover:underline font-medium"
-                  >
-                    Remove
-                  </button>
+                  <button type="button" className="text-sm text-error font-medium">Remove</button>
                 </div>
               </div>
-
-              {/* Name Fields */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="input-label">First Name</label>
-                  <input
-                    type="text"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="input-field"
-                  />
+                  <input type="text" defaultValue={displayUser.name.split(' ')[0]} className="input-field" />
                 </div>
                 <div>
                   <label className="input-label">Last Name</label>
-                  <input
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="input-field"
-                  />
+                  <input type="text" defaultValue={displayUser.name.split(' ').slice(1).join(' ')} className="input-field" />
                 </div>
               </div>
-              
               <div>
                 <label className="input-label">Email</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="input-field"
-                />
+                <input type="email" defaultValue={displayUser.email} className="input-field" />
               </div>
-              
-              {/* Role Field - Replaced Location */}
               <div>
                 <label className="input-label">Role</label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  className="input-field appearance-none cursor-pointer"
-                >
-                  <option value="Student">Student</option>
-                  <option value="Instructor">Instructor</option>
-                  <option value="Admin">Admin</option>
+                <select defaultValue={displayUser.role} className="input-field">
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="admin">Admin</option>
                 </select>
               </div>
-              
               <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  disabled={isLoading}
-                  className="btn btn-ghost flex-1 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="btn btn-primary flex-1 disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </button>
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
+                <button type="submit" className="btn btn-primary flex-1">Save Changes</button>
               </div>
             </form>
           </div>
