@@ -51,6 +51,14 @@ export const authApi = createApi({
                 url: "/profile",
                 method: "GET"
             })
+        }),
+        updateUser: builder.mutation({
+            query: (formData) =>({
+                url: "profile/edit",
+                method: "PUT",
+                body: formData,
+                credentials: "include"
+            })
         })
 
     })                               // ✅ }) — closes object with parenthesis
@@ -58,4 +66,4 @@ export const authApi = createApi({
 
 
 // Export the auto-generated hook
-export const { useRegisterUserMutation, useLoginUserMutation, useLoadUserQuery } = authApi
+export const { useRegisterUserMutation, useLoginUserMutation, useLoadUserQuery, useUpdateUserMutation } = authApi
