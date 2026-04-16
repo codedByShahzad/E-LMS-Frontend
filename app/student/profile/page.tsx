@@ -47,7 +47,8 @@ export default function ProfilePage() {
   const [updateUser, { isLoading: updateUserLoading }] =
     useUpdateUserMutation();
 
-  const apiUser = (data as { user?: LoadUserResponse })?.user;
+  // ✅ FIX: safe optional chaining (NO casting)
+  const apiUser = data?.user ?? undefined;
 
   const displayUser = {
     name: apiUser?.name || userData.name,
@@ -85,10 +86,8 @@ export default function ProfilePage() {
 
       await updateUser(formData).unwrap();
 
-      // 🔥 Refresh user data so UI updates immediately
       await refetch();
 
-      // 🔥 Reset + close modal
       setIsEditModalOpen(false);
       setName("");
       setProfilePhoto(null);
@@ -112,6 +111,7 @@ export default function ProfilePage() {
         <div className="page-container py-8 md:py-12">
           <div className="card p-6 md:p-8">
             <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+
               {/* Avatar */}
               <div className="relative w-24 h-24 md:w-28 md:h-28">
                 <div className="w-full h-full rounded-full overflow-hidden ring-4 ring-primary-100">
@@ -158,6 +158,7 @@ export default function ProfilePage() {
                 <Edit3 className="w-4 h-4" />
                 Edit Profile
               </button>
+
             </div>
           </div>
         </div>
@@ -188,6 +189,7 @@ export default function ProfilePage() {
       {isEditModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md">
+
             <div className="flex justify-between mb-4">
               <h2>Edit Profile</h2>
               <button onClick={() => setIsEditModalOpen(false)}>
@@ -214,6 +216,7 @@ export default function ProfilePage() {
                 {updateUserLoading ? "Updating..." : "Save Changes"}
               </button>
             </form>
+
           </div>
         </div>
       )}
