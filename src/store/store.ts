@@ -1,17 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/authSlice";
+import rootReducer from "./rootReducer"; // adjust path if needed
 import { authApi } from "../features/api/authApi";
+import { courseApi } from "../features/api/courseApi";
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    [authApi.reducerPath]: authApi.reducer,
-  },
+  reducer: rootReducer,
 
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware),
+    getDefaultMiddleware().concat(
+      authApi.middleware,
+      courseApi.middleware
+    ),
 });
 
-// ✅ TYPES (THIS FIXES ALL useSelector ERRORS)
+// ✅ TYPES
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
