@@ -2,6 +2,7 @@
 
 import { useCreateCourseMutation } from "@/src/features/api/courseApi";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const categories = [
   "Web Development",
@@ -17,6 +18,8 @@ const categories = [
 ];
 
 export default function CreateCoursePage() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     courseTitle: "",
     category: "",
@@ -26,7 +29,7 @@ export default function CreateCoursePage() {
   const [createCourse, { isLoading, isSuccess }] =
     useCreateCourseMutation();
 
-  // Reset form after successful creation
+  // Reset form + redirect after success
   useEffect(() => {
     if (isSuccess) {
       setFormData({
@@ -34,8 +37,10 @@ export default function CreateCoursePage() {
         category: "",
         coursePrice: "",
       });
+
+      router.push("/admin/course");
     }
-  }, [isSuccess]);
+  }, [isSuccess, router]);
 
   const createCourseHandler = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +72,7 @@ export default function CreateCoursePage() {
           Let's add a Course
         </h1>
         <p className="text-gray-600">
-          Add some basic details for your new course. You can edit these later.
+          Add basic details for your new course. You can edit later anytime.
         </p>
       </div>
 
