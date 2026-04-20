@@ -83,7 +83,7 @@ export default function Navbar() {
   ];
 
   const profileLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/student/learning", label: "My learning", icon: BookMarked },
     { href: "/student/profile", label: "Edit Profile", icon: User },
     { href: "/settings", label: "Settings", icon: Settings },

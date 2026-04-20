@@ -56,10 +56,13 @@ export default function CoursePage() {
                   </span>
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button className="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">
-                    Edit
-                  </button>
-                </td>
+  <Link
+    href={`/admin/course/${course._id}`}
+    className="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors inline-block"
+  >
+    Edit
+  </Link>
+</td>
               </tr>
             ))}
           </tbody>
